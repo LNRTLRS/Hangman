@@ -137,12 +137,13 @@ namespace Hangman
                 do
                 {
                     Char[] guess;
-                    //Console.Clear();
+                    Console.Clear();
                     Boolean found = false;
                     Console.WriteLine(Drawings[fails]);
                     Console.WriteLine((p == Playing.PlayerOne) ? "You're up, good luck." : "Player two? What is your guess?");
                     Console.WriteLine(masked);
                     Console.WriteLine("Guessed letters: " + String.Join(" ", guesses));
+                    Console.WriteLine(new String(wordToFind));
                     Console.WriteLine("----------");
                     guess = Console.ReadLine().ToLower().ToCharArray();
                     if (guess.Length < 2)
@@ -162,16 +163,45 @@ namespace Hangman
                         guesses.Add(guess[0]);
                     } else
                     {
-                        Console.Write(guess.ToString() + " " + wordToFind.ToString());
-                        if(guess == wordToFind)
+                        if (new String(guess) == new String(wordToFind))
                         {
-                            Console.WriteLine((p == Playing.PlayerOne) ? "Congrats, you guessed the right word!" : "Too bad, player two won.");
+                            Console.Clear();
+                            switch(p)
+                            {
+                                case Playing.PlayerOne:
+                                    Console.WriteLine("Congrats, you guessed the right word!");
+                                    s = State.Won;
+                                    break;
+                                case Playing.PlayerTwo:
+                                    Console.WriteLine("Too bad, you lost...");
+                                    s = State.Lost;
+                                    break;
+                            }
                         } else
                         {
                             guessedWords.Add(guess.ToString());
+                            fails++;
                         }
                     }
-                } while (fails < 11);
+                    if(fails == 10)
+                    {
+                        s = State.Lost;
+                    }
+                    if(p == Playing.PlayerOne)
+                    {
+                        p = Playing.PlayerTwo;
+                    } else
+                    {
+                        p = Playing.PlayerOne;
+                    }
+                } while (s == State.Playing);
+                if(s == State.Won)
+                {
+                    Console.WriteLine("You won!");
+                } else
+                {
+                    Console.WriteLine("Better luck next time!");
+                }
                 break;
             } while (true);
             #endregion
