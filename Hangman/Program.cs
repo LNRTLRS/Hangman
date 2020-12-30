@@ -166,6 +166,8 @@ namespace Hangman
 
                     do
                     {
+                        #region Guess checking
+
                         guess = Console.ReadLine()?.ToLower().ToCharArray();
                         if (guess.Length <= 0) continue;
                         if (guess.Length < 2)
@@ -176,10 +178,14 @@ namespace Hangman
                         {
                             if (!guessedWords.Contains(new string(guess))) break;
                         }
+
+                        #endregion
                     } while (true);
 
                     if (guess.Length < 2)
                     {
+                        #region Letter guess
+
                         for (var i = 0; i < wordToFind.Length; i++)
                             if (wordToFind[i] == guess[0])
                             {
@@ -189,9 +195,13 @@ namespace Hangman
 
                         if (!found) fails++;
                         guesses.Add(guess[0]);
+
+                        #endregion
                     }
                     else
                     {
+                        #region Word guess
+
                         if (new string(guess) == new string(wordToFind))
                         {
                             Console.Clear();
@@ -214,6 +224,8 @@ namespace Hangman
                             guessedWords.Add(new string(guess));
                             fails++;
                         }
+
+                        #endregion
                     }
 
                     if (fails == 10) s = State.Lost;
