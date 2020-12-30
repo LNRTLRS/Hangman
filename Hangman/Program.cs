@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TM.ProgrammingAdvanced;
 
 namespace Hangman
@@ -112,7 +113,9 @@ namespace Hangman
                 var masked = new char[wordToFind.Length];
                 var guessedWords = new List<string>();
                 var guesses = new List<char>();
+                var wrongGuesses = new List<char>();
                 for (var i = 0; i < wordToFind.Length; i++) masked[i] = '_';
+                var possibleWords = Words.Where(word => word.Length == wordToFind.Length).ToList();
 
                 #endregion
 
@@ -149,6 +152,28 @@ namespace Hangman
                     Console.Clear();
                     var found = false;
 
+                    #region Possible words for AI
+
+                    foreach (var wrongGuess in wrongGuesses)
+                    {
+                        foreach (var word in Words)
+                        {
+                            if (word.Contains(wrongGuess)) possibleWords.Remove(word);
+                        }
+                    }
+
+                    for (var i = 0; i < masked.Length; i++)
+                    {
+                        if (masked[i] == '_') continue;
+                        foreach (var word in possibleWords.ToList())
+                        {
+                            var temp = word.ToCharArray();
+                            if (temp[i] != masked[i]) possibleWords.Remove(word);
+                        }
+                    }
+
+                    #endregion
+
                     #region Console Writelines
 
                     Console.WriteLine(Drawings[fails]);
@@ -157,6 +182,8 @@ namespace Hangman
                     Console.WriteLine("--------------------------");
                     Console.WriteLine("Guessed letters: " + string.Join(" ", guesses));
                     Console.WriteLine("Guessed words: " + string.Join(" ", guessedWords));
+                    Console.WriteLine("--------------------------");
+                    Console.WriteLine(string.Join("\n", possibleWords));
                     Console.WriteLine("--------------------------");
                     Console.WriteLine(p == Playing.PlayerOne
                         ? "You're up, good luck."
@@ -167,7 +194,11 @@ namespace Hangman
                     do
                     {
                         #region Guess checking
-
+                        if (possibleWords.Count == 1 && p == Playing.PlayerTwo)
+                        {
+                            guess = possibleWords[0].ToCharArray();
+                            break;
+                        }
                         guess = Console.ReadLine()?.ToLower().ToCharArray();
                         if (guess.Length <= 0) continue;
                         if (guess.Length < 2)
@@ -193,7 +224,11 @@ namespace Hangman
                                 masked[i] = guess[0];
                             }
 
-                        if (!found) fails++;
+                        if (!found)
+                        {
+                            fails++;
+                            wrongGuesses.Add(guess[0]);
+                        }
                         guesses.Add(guess[0]);
 
                         #endregion
