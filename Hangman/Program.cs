@@ -1,83 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
+using TM.ProgrammingAdvanced;
 
 namespace Hangman
 {
-    class Program
+    internal class Program
     {
         #region Hangmen ASCII
-        public static string[] Drawings = {
-@"         
+
+        public static string[] Drawings =
+        {
+            @"         
                
           
           
           
           
          ",
-@"         
+            @"         
                
           
           
           
           
 =========",
-@"
+            @"
       |
       |
       |
       |
       |
 =========",
-@"  +---+
+            @"  +---+
       |
       |
       |
       |
       |
 =========",
-@"  +---+
+            @"  +---+
   |   |
       |
       |
       |
       |
 =========",
-@"  +---+
-  |   |
-  O   |
-      |
-      |
-      |
-=========",
-@"  +---+
+            @"  +---+
   |   |
   O   |
+      |
+      |
+      |
+=========",
+            @"  +---+
+  |   |
+  O   |
   |   |
       |
       |
 =========",
-@"  +---+
+            @"  +---+
   |   |
   O   |
  /|   |
       |
       |
 =========",
-@"  +---+
+            @"  +---+
   |   |
   O   |
  /|\  |
       |
       |
 =========",
-@"  +---+
+            @"  +---+
   |   |
   O   |
  /|\  |
  /    |
       |
 =========",
-@"  +---+
+            @"  +---+
   |   |
   O   |
  /|\  |
@@ -85,37 +88,36 @@ namespace Hangman
       |
 ========="
         };
-        #endregion
-        enum State { Playing, Won, Lost };
-        enum Playing { PlayerOne, PlayerTwo }
-        public static string[] Words = TM.ProgrammingAdvanced.Data.Words;
 
-        static void Main(string[] args)
+        #endregion
+
+        public static string[] Words = Data.Words;
+
+        private static void Main()
         {
             Console.WriteLine("----- HANGMAN -----");
 
             #region Game
+
             do
             {
                 string input;
-                State s = State.Playing;
+                var s = State.Playing;
                 Playing p;
-                Random r = new Random(Guid.NewGuid().GetHashCode());
+                var r = new Random(Guid.NewGuid().GetHashCode());
                 int hOrT = r.Next(0, 2), fails = 0;
-                Char[] wordToFind = Words[r.Next(Words.Length)].ToLower().ToCharArray();
-                Char[] masked = new Char[wordToFind.Length];
-                List<String> guessedWords = new List<String>();
-                List<Char> guesses = new List<Char>();
+                var wordToFind = Words[r.Next(Words.Length)].ToLower().ToCharArray();
+                var masked = new char[wordToFind.Length];
+                var guessedWords = new List<string>();
+                var guesses = new List<char>();
 
-                for (int i = 0; i < wordToFind.Length; i++)
-                {
-                    masked[i] = '_';
-                }
+                for (var i = 0; i < wordToFind.Length; i++) masked[i] = '_';
 
                 #region Heads or tails
+
                 Console.WriteLine("To decide who is allowed to start, I'll flip a coin.");
                 Console.WriteLine("Type H or T to choose the side.");
-                input = Console.ReadLine().ToUpper();
+                input = Console.ReadLine()?.ToUpper();
                 Console.Clear();
                 if (hOrT == 0 && input == "H" || hOrT == 1 && input == "T")
                 {
@@ -132,61 +134,54 @@ namespace Hangman
                     p = Playing.PlayerTwo;
                     Console.WriteLine("You didn't enter a valid choice. Player two is going first now.");
                 }
+
                 #endregion
 
                 do
                 {
-                    Char[] guess;
+                    char[] guess;
                     Console.Clear();
-                    Boolean found = false;
+                    var found = false;
                     Console.WriteLine(Drawings[fails]);
                     Console.WriteLine("----------");
                     Console.WriteLine(masked);
                     Console.WriteLine("----------");
-                    Console.WriteLine("Guessed letters: " + String.Join(" ", guesses));
-                    Console.WriteLine("Guessed words: " + String.Join(" ", guessedWords));
+                    Console.WriteLine("Guessed letters: " + string.Join(" ", guesses));
+                    Console.WriteLine("Guessed words: " + string.Join(" ", guessedWords));
                     //Console.WriteLine(new String(wordToFind));
                     Console.WriteLine("----------");
-                    Console.WriteLine((p == Playing.PlayerOne) ? "You're up, good luck." : "Player two? What is your guess?");
+                    Console.WriteLine(p == Playing.PlayerOne
+                        ? "You're up, good luck."
+                        : "Player two? What is your guess?");
                     do
                     {
-                        guess = Console.ReadLine().ToLower().ToCharArray();
-                        if (guess.Length > 0)
+                        guess = Console.ReadLine()?.ToLower().ToCharArray();
+                        if (guess.Length <= 0) continue;
+                        if (guess.Length < 2)
                         {
-                            if(guess.Length < 2)
-                            {
-                                if (!guesses.Contains(guess[0]))
-                                {
-                                    break;
-                                }
-                            } else
-                            {
-                                if (!guessedWords.Contains(new string(guess)))
-                                {
-                                    break;
-                                }
-                            }
+                            if (!guesses.Contains(guess[0])) break;
+                        }
+                        else
+                        {
+                            if (!guessedWords.Contains(new string(guess))) break;
                         }
                     } while (true);
+
                     if (guess.Length < 2)
                     {
-                        for (int i = 0; i < wordToFind.Length; i++)
-                        {
+                        for (var i = 0; i < wordToFind.Length; i++)
                             if (wordToFind[i] == guess[0])
                             {
                                 found = true;
                                 masked[i] = guess[0];
                             }
-                        }
-                        if (!found)
-                        {
-                            fails++;
-                        }
+
+                        if (!found) fails++;
                         guesses.Add(guess[0]);
                     }
                     else
                     {
-                        if (new String(guess) == new String(wordToFind))
+                        if (new string(guess) == new string(wordToFind))
                         {
                             Console.Clear();
                             switch (p)
@@ -199,39 +194,43 @@ namespace Hangman
                                     Console.WriteLine("Too bad, you lost...");
                                     s = State.Lost;
                                     break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
                         else
                         {
-                            guessedWords.Add(new String(guess));
+                            guessedWords.Add(new string(guess));
                             fails++;
                         }
                     }
-                    if (fails == 10)
-                    {
-                        s = State.Lost;
-                    }
-                    if (p == Playing.PlayerOne)
-                    {
-                        p = Playing.PlayerTwo;
-                    }
-                    else
-                    {
-                        p = Playing.PlayerOne;
-                    }
+
+                    if (fails == 10) s = State.Lost;
+                    if (new string(masked) == new string(wordToFind) && p == Playing.PlayerOne) s = State.Won;
+                    if (new string(masked) == new string(wordToFind) && p == Playing.PlayerTwo) s = State.Lost;
+                    p = p == Playing.PlayerOne ? Playing.PlayerTwo : Playing.PlayerOne;
                 } while (s == State.Playing);
-                if (s == State.Won)
-                {
-                    Console.WriteLine("You won!");
-                }
-                else
-                {
-                    Console.WriteLine("Better luck next time!");
-                }
+                Console.Clear();
+                Console.WriteLine(s == State.Won ? "You won!" : "Better luck next time!");
                 break;
             } while (true);
+
             #endregion
+
             Console.ReadLine();
+        }
+
+        private enum State
+        {
+            Playing,
+            Won,
+            Lost
+        }
+
+        private enum Playing
+        {
+            PlayerOne,
+            PlayerTwo
         }
     }
 }
