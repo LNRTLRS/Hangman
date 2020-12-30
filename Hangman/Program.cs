@@ -101,6 +101,8 @@ namespace Hangman
 
             do
             {
+                #region Init of vars
+
                 string input;
                 var s = State.Playing;
                 Playing p;
@@ -110,8 +112,9 @@ namespace Hangman
                 var masked = new char[wordToFind.Length];
                 var guessedWords = new List<string>();
                 var guesses = new List<char>();
-
                 for (var i = 0; i < wordToFind.Length; i++) masked[i] = '_';
+
+                #endregion
 
                 #region Heads or tails
 
@@ -135,6 +138,9 @@ namespace Hangman
                     Console.WriteLine("You didn't enter a valid choice. Player two is going first now.");
                 }
 
+                Console.WriteLine("Press any key to start the game");
+                Console.ReadLine();
+
                 #endregion
 
                 do
@@ -142,17 +148,22 @@ namespace Hangman
                     char[] guess;
                     Console.Clear();
                     var found = false;
+
+                    #region Console Writelines
+
                     Console.WriteLine(Drawings[fails]);
-                    Console.WriteLine("----------");
-                    Console.WriteLine(masked);
-                    Console.WriteLine("----------");
+                    Console.WriteLine("--------------------------");
+                    Console.WriteLine("The word: " + new string(masked));
+                    Console.WriteLine("--------------------------");
                     Console.WriteLine("Guessed letters: " + string.Join(" ", guesses));
                     Console.WriteLine("Guessed words: " + string.Join(" ", guessedWords));
-                    //Console.WriteLine(new String(wordToFind));
-                    Console.WriteLine("----------");
+                    Console.WriteLine("--------------------------");
                     Console.WriteLine(p == Playing.PlayerOne
                         ? "You're up, good luck."
                         : "Player two? What is your guess?");
+
+                    #endregion
+
                     do
                     {
                         guess = Console.ReadLine()?.ToLower().ToCharArray();
@@ -210,15 +221,34 @@ namespace Hangman
                     if (new string(masked) == new string(wordToFind) && p == Playing.PlayerTwo) s = State.Lost;
                     p = p == Playing.PlayerOne ? Playing.PlayerTwo : Playing.PlayerOne;
                 } while (s == State.Playing);
+
+                #region Game end
+
                 Console.Clear();
+                Console.WriteLine("The word was: " + new string(wordToFind));
                 Console.WriteLine(s == State.Won ? "You won!" : "Better luck next time!");
+                Console.WriteLine("Want to play another game? Type Y or N:");
+                do
+                {
+                    input = Console.ReadLine()?.ToLower();
+                    if (input == "y") break;
+                    if (input == "n") break;
+                } while (true);
+
+                if (input != "n") continue;
+                Console.WriteLine("Thanks for playing, see you next time!");
                 break;
+
+                #endregion
+
             } while (true);
 
             #endregion
 
             Console.ReadLine();
         }
+
+        #region Enums
 
         private enum State
         {
@@ -230,7 +260,10 @@ namespace Hangman
         private enum Playing
         {
             PlayerOne,
-            PlayerTwo
+            PlayerTwo,
+            Computer
         }
+
+        #endregion
     }
 }
