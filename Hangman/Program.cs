@@ -140,12 +140,34 @@ namespace Hangman
                     Console.Clear();
                     Boolean found = false;
                     Console.WriteLine(Drawings[fails]);
-                    Console.WriteLine((p == Playing.PlayerOne) ? "You're up, good luck." : "Player two? What is your guess?");
-                    Console.WriteLine(masked);
-                    Console.WriteLine("Guessed letters: " + String.Join(" ", guesses));
-                    Console.WriteLine(new String(wordToFind));
                     Console.WriteLine("----------");
-                    guess = Console.ReadLine().ToLower().ToCharArray();
+                    Console.WriteLine(masked);
+                    Console.WriteLine("----------");
+                    Console.WriteLine("Guessed letters: " + String.Join(" ", guesses));
+                    Console.WriteLine("Guessed words: " + String.Join(" ", guessedWords));
+                    //Console.WriteLine(new String(wordToFind));
+                    Console.WriteLine("----------");
+                    Console.WriteLine((p == Playing.PlayerOne) ? "You're up, good luck." : "Player two? What is your guess?");
+                    do
+                    {
+                        guess = Console.ReadLine().ToLower().ToCharArray();
+                        if (guess.Length > 0)
+                        {
+                            if(guess.Length < 2)
+                            {
+                                if (!guesses.Contains(guess[0]))
+                                {
+                                    break;
+                                }
+                            } else
+                            {
+                                if (!guessedWords.Contains(new string(guess)))
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    } while (true);
                     if (guess.Length < 2)
                     {
                         for (int i = 0; i < wordToFind.Length; i++)
@@ -161,12 +183,13 @@ namespace Hangman
                             fails++;
                         }
                         guesses.Add(guess[0]);
-                    } else
+                    }
+                    else
                     {
                         if (new String(guess) == new String(wordToFind))
                         {
                             Console.Clear();
-                            switch(p)
+                            switch (p)
                             {
                                 case Playing.PlayerOne:
                                     Console.WriteLine("Congrats, you guessed the right word!");
@@ -177,28 +200,31 @@ namespace Hangman
                                     s = State.Lost;
                                     break;
                             }
-                        } else
+                        }
+                        else
                         {
-                            guessedWords.Add(guess.ToString());
+                            guessedWords.Add(new String(guess));
                             fails++;
                         }
                     }
-                    if(fails == 10)
+                    if (fails == 10)
                     {
                         s = State.Lost;
                     }
-                    if(p == Playing.PlayerOne)
+                    if (p == Playing.PlayerOne)
                     {
                         p = Playing.PlayerTwo;
-                    } else
+                    }
+                    else
                     {
                         p = Playing.PlayerOne;
                     }
                 } while (s == State.Playing);
-                if(s == State.Won)
+                if (s == State.Won)
                 {
                     Console.WriteLine("You won!");
-                } else
+                }
+                else
                 {
                     Console.WriteLine("Better luck next time!");
                 }
