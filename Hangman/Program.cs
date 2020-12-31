@@ -109,7 +109,11 @@ namespace Hangman
                 Playing p;
                 var r = new Random(Guid.NewGuid().GetHashCode());
                 int hOrT = r.Next(0, 2), fails = 0;
-                var wordToFind = Words[r.Next(Words.Length)].ToLower().ToCharArray();
+                char[] wordToFind;
+                do
+                {
+                    wordToFind = Words[r.Next(Words.Length)].ToLower().ToCharArray();
+                } while (wordToFind.Length < 4 && wordToFind.Length > 14);
                 var masked = new char[wordToFind.Length];
                 var guessedWords = new List<string>();
                 var guesses = new List<char>();
