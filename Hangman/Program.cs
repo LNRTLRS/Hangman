@@ -95,7 +95,7 @@ namespace Hangman
         #endregion
 
         //public static string[] Words = Data.Words;
-        public static string[] Words = File.ReadAllLines("../../../wordlist.txt");
+        private static readonly string[] Words = File.ReadAllLines("../../../wordlist.txt");
 
         private static void Main()
         {
