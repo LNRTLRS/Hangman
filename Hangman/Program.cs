@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using TM.ProgrammingAdvanced;
 
 namespace Hangman
@@ -92,13 +94,16 @@ namespace Hangman
 
         #endregion
 
-        public static string[] Words = Data.Words;
+        //public static string[] Words = Data.Words;
+        public static string[] Words = File.ReadAllLines("../../../wordlist.txt");
 
         private static void Main()
         {
             Console.WriteLine("----- HANGMAN -----");
 
             #region Game
+
+            var scores = new Dictionary<Playing, int>();
 
             do
             {
@@ -113,7 +118,7 @@ namespace Hangman
                 do
                 {
                     wordToFind = Words[r.Next(Words.Length)].ToLower().ToCharArray();
-                } while (wordToFind.Length < 4 && wordToFind.Length > 14);
+                } while (wordToFind.Length < 4 || wordToFind.Length > 14);
                 var masked = new char[wordToFind.Length];
                 var guessedWords = new List<string>();
                 var guesses = new List<char>();
@@ -153,6 +158,8 @@ namespace Hangman
                 do
                 {
                     char[] guess;
+                    var charCount = new Dictionary<char, int>();
+                    var orderedCount = new Dictionary<char, int>();
                     Console.Clear();
                     var found = false;
 
@@ -176,19 +183,39 @@ namespace Hangman
                         }
                     }
 
+                    foreach (var word in possibleWords)
+                    {
+                        foreach (var c in word)
+                        {
+                            if (guesses.Contains(c)) continue;
+                            if (charCount.ContainsKey(c))
+                            {
+                                charCount[c]++;
+                            }
+                            else
+                            {
+                                charCount.Add(c, 1);
+                            }
+                        }
+                    }
+
+
                     #endregion
 
                     #region Console Writelines
 
                     Console.WriteLine(Drawings[fails]);
                     Console.WriteLine("--------------------------");
-                    Console.WriteLine("The word: " + new string(masked));
+                    Console.WriteLine(wordToFind);
+                    Console.WriteLine("The word: " + new string(masked) + " (" + masked.Length + " characters)");
                     Console.WriteLine("--------------------------");
                     Console.WriteLine("Guessed letters: " + string.Join(" ", guesses));
                     Console.WriteLine("Guessed words: " + string.Join(" ", guessedWords));
                     Console.WriteLine("--------------------------");
-                    Console.WriteLine(string.Join("\n", possibleWords));
-                    Console.WriteLine("--------------------------");
+                    foreach (var (key, value) in charCount.OrderByDescending(key => key.Value))
+                    {
+                        orderedCount.Add(key, value);
+                    }
                     Console.WriteLine(p == Playing.PlayerOne
                         ? "You're up, good luck."
                         : "Player two? What is your guess?");
@@ -198,10 +225,18 @@ namespace Hangman
                     do
                     {
                         #region Guess checking
-                        if (possibleWords.Count == 1 && p == Playing.PlayerTwo)
+
+                        if (p == Playing.PlayerTwo)
                         {
-                            guess = possibleWords[0].ToCharArray();
+                            if (possibleWords.Count == 1)
+                            {
+                                guess = possibleWords[0].ToCharArray();
+                                break;
+                            }
+                            var t = orderedCount.FirstOrDefault().Key.ToString();
+                            guess = t.ToCharArray();
                             break;
+
                         }
                         guess = Console.ReadLine()?.ToLower().ToCharArray();
                         if (guess.Length <= 0) continue;
@@ -226,6 +261,14 @@ namespace Hangman
                             {
                                 found = true;
                                 masked[i] = guess[0];
+                                if (!scores.ContainsKey(p))
+                                {
+                                    scores.Add(p, 1);
+                                }
+                                else
+                                {
+                                    scores[p]++;
+                                }
                             }
 
                         if (!found)
@@ -244,6 +287,14 @@ namespace Hangman
                         if (new string(guess) == new string(wordToFind))
                         {
                             Console.Clear();
+                            if (!scores.ContainsKey(p))
+                            {
+                                scores.Add(p, 5);
+                            }
+                            else
+                            {
+                                scores[p] += 5;
+                            }
                             switch (p)
                             {
                                 case Playing.PlayerOne:
@@ -278,15 +329,21 @@ namespace Hangman
                 Console.Clear();
                 Console.WriteLine("The word was: " + new string(wordToFind));
                 Console.WriteLine(s == State.Won ? "You won!" : "Better luck next time!");
+                Console.WriteLine("You scored " + scores[Playing.PlayerOne] + " points so far, while the AI scored " + scores[Playing.PlayerTwo] + " points.");
                 Console.WriteLine("Want to play another game? Type Y or N:");
                 do
                 {
                     input = Console.ReadLine()?.ToLower();
-                    if (input == "y") break;
+                    if (input == "y")
+                    {
+                        Console.Clear();
+                        break;
+                    }
                     if (input == "n") break;
                 } while (true);
 
                 if (input != "n") continue;
+                Console.Clear();
                 Console.WriteLine("Thanks for playing, see you next time!");
                 break;
 
