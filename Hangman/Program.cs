@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using TM.ProgrammingAdvanced;
 
 namespace Hangman
 {
@@ -93,8 +91,7 @@ namespace Hangman
         };
 
         #endregion
-
-        //public static string[] Words = Data.Words;
+        
         private static readonly string[] Words = File.ReadAllLines("../../../wordlist.txt");
 
         private static void Main()
@@ -103,7 +100,11 @@ namespace Hangman
 
             #region Game
 
-            var scores = new Dictionary<Playing, int>();
+            var scores = new Dictionary<Playing, int>()
+            {
+                {Playing.PlayerOne, 0},
+                {Playing.PlayerTwo, 0}
+            };
 
             do
             {
@@ -206,7 +207,6 @@ namespace Hangman
 
                     Console.WriteLine(Drawings[fails]);
                     Console.WriteLine("--------------------------");
-                    Console.WriteLine(wordToFind);
                     Console.WriteLine("The word: " + new string(masked) + " (" + masked.Length + " characters)");
                     Console.WriteLine("--------------------------");
                     Console.WriteLine("Guessed letters: " + string.Join(" ", guesses));
@@ -261,14 +261,7 @@ namespace Hangman
                             {
                                 found = true;
                                 masked[i] = guess[0];
-                                if (!scores.ContainsKey(p))
-                                {
-                                    scores.Add(p, 1);
-                                }
-                                else
-                                {
-                                    scores[p]++;
-                                }
+                                scores[p]++;
                             }
 
                         if (!found)
@@ -287,14 +280,7 @@ namespace Hangman
                         if (new string(guess) == new string(wordToFind))
                         {
                             Console.Clear();
-                            if (!scores.ContainsKey(p))
-                            {
-                                scores.Add(p, 5);
-                            }
-                            else
-                            {
-                                scores[p] += 5;
-                            }
+                            scores[p] += 5;
                             switch (p)
                             {
                                 case Playing.PlayerOne:
@@ -368,8 +354,7 @@ namespace Hangman
         private enum Playing
         {
             PlayerOne,
-            PlayerTwo,
-            Computer
+            PlayerTwo
         }
 
         #endregion
