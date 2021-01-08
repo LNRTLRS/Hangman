@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Hangman
 {
@@ -96,7 +97,16 @@ namespace Hangman
 
         private static void Main()
         {
-            Console.WriteLine("----- HANGMAN -----");
+            string intro = @" __    __  ______  __    __  ______  __       __  ______  __    __ 
+|  \  |  \/      \|  \  |  \/      \|  \     /  \/      \|  \  |  \
+| ▓▓  | ▓▓  ▓▓▓▓▓▓\ ▓▓\ | ▓▓  ▓▓▓▓▓▓\ ▓▓\   /  ▓▓  ▓▓▓▓▓▓\ ▓▓\ | ▓▓
+| ▓▓__| ▓▓ ▓▓__| ▓▓ ▓▓▓\| ▓▓ ▓▓ __\▓▓ ▓▓▓\ /  ▓▓▓ ▓▓__| ▓▓ ▓▓▓\| ▓▓
+| ▓▓    ▓▓ ▓▓    ▓▓ ▓▓▓▓\ ▓▓ ▓▓|    \ ▓▓▓▓\  ▓▓▓▓ ▓▓    ▓▓ ▓▓▓▓\ ▓▓
+| ▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓ ▓▓\▓▓ ▓▓ ▓▓ \▓▓▓▓ ▓▓\▓▓ ▓▓ ▓▓ ▓▓▓▓▓▓▓▓ ▓▓\▓▓ ▓▓
+| ▓▓  | ▓▓ ▓▓  | ▓▓ ▓▓ \▓▓▓▓ ▓▓__| ▓▓ ▓▓ \▓▓▓| ▓▓ ▓▓  | ▓▓ ▓▓ \▓▓▓▓
+| ▓▓  | ▓▓ ▓▓  | ▓▓ ▓▓  \▓▓▓\▓▓    ▓▓ ▓▓  \▓ | ▓▓ ▓▓  | ▓▓ ▓▓  \▓▓▓
+ \▓▓   \▓▓\▓▓   \▓▓\▓▓   \▓▓ \▓▓▓▓▓▓ \▓▓      \▓▓\▓▓   \▓▓\▓▓   \▓▓";
+            Console.WriteLine(intro + "\n");
 
             #region Game
 
@@ -143,12 +153,12 @@ namespace Hangman
                 else if (input == "H" || input == "T")
                 {
                     p = Playing.PlayerTwo;
-                    Console.WriteLine("Too bad, player two is allowed to begin.");
+                    Console.WriteLine("Too bad, the computer is allowed to begin.");
                 }
                 else
                 {
                     p = Playing.PlayerTwo;
-                    Console.WriteLine("You didn't enter a valid choice. Player two is going first now.");
+                    Console.WriteLine("You didn't enter a valid choice. The computer is going first now.");
                 }
 
                 Console.WriteLine("Press any key to start the game");
@@ -218,7 +228,7 @@ namespace Hangman
                     }
                     Console.WriteLine(p == Playing.PlayerOne
                         ? "You're up, good luck."
-                        : "Player two? What is your guess?");
+                        : "The computer is thinking...");
 
                     #endregion
 
@@ -231,12 +241,13 @@ namespace Hangman
                             if (possibleWords.Count == 1)
                             {
                                 guess = possibleWords[0].ToCharArray();
+                                Thread.Sleep(1500);
                                 break;
                             }
                             var t = orderedCount.FirstOrDefault().Key.ToString();
                             guess = t.ToCharArray();
+                            Thread.Sleep(1500);
                             break;
-
                         }
                         guess = Console.ReadLine()?.ToLower().ToCharArray();
                         if (guess.Length <= 0) continue;
@@ -315,7 +326,7 @@ namespace Hangman
                 Console.Clear();
                 Console.WriteLine("The word was: " + new string(wordToFind));
                 Console.WriteLine(s == State.Won ? "You won!" : "Better luck next time!");
-                Console.WriteLine("You scored " + scores[Playing.PlayerOne] + " points so far, while the AI scored " + scores[Playing.PlayerTwo] + " points.");
+                Console.WriteLine("You scored " + scores[Playing.PlayerOne] + " points so far, while the computer scored " + scores[Playing.PlayerTwo] + " points.");
                 Console.WriteLine("Want to play another game? Type Y or N:");
                 do
                 {
