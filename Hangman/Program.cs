@@ -112,8 +112,8 @@ namespace Hangman
 
             var scores = new Dictionary<Playing, int>()
             {
-                {Playing.PlayerOne, 0},
-                {Playing.PlayerTwo, 0}
+                {Playing.Human, 0},
+                {Playing.Computer, 0}
             };
 
             do
@@ -147,17 +147,17 @@ namespace Hangman
                 Console.Clear();
                 if (hOrT == 0 && input == "H" || hOrT == 1 && input == "T")
                 {
-                    p = Playing.PlayerOne;
+                    p = Playing.Human;
                     Console.WriteLine("You guessed correctly, you may start.");
                 }
                 else if (input == "H" || input == "T")
                 {
-                    p = Playing.PlayerTwo;
+                    p = Playing.Computer;
                     Console.WriteLine("Too bad, the computer is allowed to begin.");
                 }
                 else
                 {
-                    p = Playing.PlayerTwo;
+                    p = Playing.Computer;
                     Console.WriteLine("You didn't enter a valid choice. The computer is going first now.");
                 }
 
@@ -226,7 +226,7 @@ namespace Hangman
                     {
                         orderedCount.Add(key, value);
                     }
-                    Console.WriteLine(p == Playing.PlayerOne
+                    Console.WriteLine(p == Playing.Human
                         ? "You're up, good luck."
                         : "The computer is thinking...");
 
@@ -236,7 +236,7 @@ namespace Hangman
                     {
                         #region Guess checking
 
-                        if (p == Playing.PlayerTwo)
+                        if (p == Playing.Computer)
                         {
                             if (possibleWords.Count == 1)
                             {
@@ -294,11 +294,11 @@ namespace Hangman
                             scores[p] += 5;
                             switch (p)
                             {
-                                case Playing.PlayerOne:
+                                case Playing.Human:
                                     Console.WriteLine("Congrats, you guessed the right word!");
                                     s = State.Won;
                                     break;
-                                case Playing.PlayerTwo:
+                                case Playing.Computer:
                                     Console.WriteLine("Too bad, you lost...");
                                     s = State.Lost;
                                     break;
@@ -316,9 +316,9 @@ namespace Hangman
                     }
 
                     if (fails == 10) s = State.Lost;
-                    if (new string(masked) == new string(wordToFind) && p == Playing.PlayerOne) s = State.Won;
-                    if (new string(masked) == new string(wordToFind) && p == Playing.PlayerTwo) s = State.Lost;
-                    p = p == Playing.PlayerOne ? Playing.PlayerTwo : Playing.PlayerOne;
+                    if (new string(masked) == new string(wordToFind) && p == Playing.Human) s = State.Won;
+                    if (new string(masked) == new string(wordToFind) && p == Playing.Computer) s = State.Lost;
+                    p = p == Playing.Human ? Playing.Computer : Playing.Human;
                 } while (s == State.Playing);
 
                 #region Game end
@@ -326,7 +326,7 @@ namespace Hangman
                 Console.Clear();
                 Console.WriteLine("The word was: " + new string(wordToFind));
                 Console.WriteLine(s == State.Won ? "You won!" : "Better luck next time!");
-                Console.WriteLine("You scored " + scores[Playing.PlayerOne] + " points so far, while the computer scored " + scores[Playing.PlayerTwo] + " points.");
+                Console.WriteLine("You scored " + scores[Playing.Human] + " points so far, while the computer scored " + scores[Playing.Computer] + " points.");
                 Console.WriteLine("Want to play another game? Type Y or N:");
                 do
                 {
@@ -364,8 +364,8 @@ namespace Hangman
 
         private enum Playing
         {
-            PlayerOne,
-            PlayerTwo
+            Human,
+            Computer
         }
 
         #endregion
